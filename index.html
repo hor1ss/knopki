@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Библиотека из 120 кнопок с анимациями на чистом CSS и JavaScript для быстрого прототипирования."
+    />
+    <title>Motion Buttons Lab · 120 анимированных стилей</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero__text">
+          <p class="eyebrow">Motion Buttons Lab</p>
+          <h1>Галерея готовых анимаций для CTA, ссылок и UI-кнопок</h1>
+          <p class="lede">
+            120 сочетаний цветов и эффектов — копируй HTML/CSS одним кликом,
+            собирай собственную библиотеку и ускоряй визуальные эксперименты.
+          </p>
+          <div class="hero__actions">
+            <button class="chip chip--active" data-scroll="#buttonGrid">
+              Смотреть коллекцию
+            </button>
+            <button class="chip chip--ghost" data-scroll="#inspector">
+              Открыть инспектор
+            </button>
+          </div>
+        </div>
+        <div class="hero__stats">
+          <div class="stat-card">
+            <p class="stat-card__label">Варианты</p>
+            <p class="stat-card__value" id="variantTotal">120</p>
+            <p class="stat-card__hint">10 палитр × 12 эффектов</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-card__label">Категории</p>
+            <p class="stat-card__value" id="categoryTotal">—</p>
+            <p class="stat-card__hint">Pulse · Outline · Glow · Orbit</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-card__label">Готовность</p>
+            <p class="stat-card__value">100%</p>
+            <p class="stat-card__hint">HTML, CSS, JS</p>
+          </div>
+        </div>
+      </header>
+
+      <section class="control-panel">
+        <div class="control-panel__search">
+          <label class="field-label" for="searchInput">Поиск</label>
+          <div class="search-input">
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="Ищи по названию, категории или тегу…"
+              autocomplete="off"
+            />
+            <button id="clearSearch" class="ghost-button" type="button">
+              Очистить
+            </button>
+          </div>
+        </div>
+        <div class="control-panel__filters">
+          <div class="filters__header">
+            <p class="field-label">Категории</p>
+            <div class="filters__actions">
+              <button id="resetFilters" class="ghost-button" type="button">
+                Сбросить
+              </button>
+              <button id="shuffleDataset" class="ghost-button" type="button">
+                Перемешать
+              </button>
+            </div>
+          </div>
+          <div id="filterRow" class="filter-row"></div>
+        </div>
+        <p class="control-panel__summary">
+          <span id="visibleCount">0</span> вариантов совпадают с фильтрами
+        </p>
+      </section>
+
+      <main id="buttonGrid" class="button-grid" aria-live="polite"></main>
+    </div>
+
+    <aside class="inspector" id="inspector" aria-live="polite">
+      <div class="inspector__header">
+        <div>
+          <p class="eyebrow" id="inspectorCategory">Выбор</p>
+          <h2 id="inspectorTitle">Выбери любой стиль слева</h2>
+          <p class="inspector__subtitle" id="inspectorDescription">
+            Карточки справа раскроют структуру HTML/CSS, добавят предпросмотр и
+            быстрые кнопки копирования. Нажми на любую кнопку в сетке.
+          </p>
+        </div>
+        <button id="inspectorClose" class="ghost-button ghost-button--icon" type="button" aria-label="Скрыть панель">
+          &times;
+        </button>
+      </div>
+      <div class="inspector__preview" id="inspectorPreview">
+        <button class="button-base placeholder-btn" type="button">
+          Выбери стиль
+        </button>
+      </div>
+      <dl class="inspector__meta">
+        <div>
+          <dt>Палитра</dt>
+          <dd id="inspectorPalette">—</dd>
+        </div>
+        <div>
+          <dt>Теги</dt>
+          <dd id="inspectorTags">—</dd>
+        </div>
+      </dl>
+      <div class="code-stack">
+        <div class="code-block">
+          <div class="code-block__header">
+            <span>HTML</span>
+            <button class="ghost-button ghost-button--tiny" data-copy="html" type="button">
+              Скопировать
+            </button>
+          </div>
+          <pre><code id="htmlSnippet">&lt;!-- Выбери карточку в сетке --&gt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span>CSS</span>
+            <button class="ghost-button ghost-button--tiny" data-copy="css" type="button">
+              Скопировать
+            </button>
+          </div>
+          <pre><code id="cssSnippet">/* Здесь появится стиль кнопки */</code></pre>
+        </div>
+      </div>
+    </aside>
+
+    <template id="buttonCardTemplate">
+      <article class="button-card" tabindex="0" role="button" aria-pressed="false">
+        <div class="button-card__header">
+          <p class="button-card__category">Категория</p>
+          <h3 class="button-card__title">Название</h3>
+        </div>
+        <button class="button-base preview-btn" type="button">Вжух!</button>
+        <div class="button-card__footer">
+          <span class="button-card__palette">Palette</span>
+          <div class="button-card__tags"></div>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
+

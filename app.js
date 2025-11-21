@@ -542,6 +542,96 @@ const effectTemplates = [
 `;
     },
   },
+  {
+    id: "bubble-press",
+    label: "Bubble Press",
+    category: "Click",
+    tags: ["press", "bubble"],
+    description: "При клике кнопка вспухает, давая мягкий bubble‑эффект.",
+    generator: ({ slug, palette }) => {
+      const rippleKeyframe = `bubbleRipple-${slug}`;
+      return `
+.button-base.btn-${slug} {
+  color: ${palette.text};
+  background: radial-gradient(circle at 20% 0%, ${palette.accent}, ${palette.primary});
+  box-shadow: 0 12px 26px ${palette.shadow};
+}
+
+.button-base.btn-${slug}::after {
+  content: "";
+  position: absolute;
+  inset: 10%;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4), transparent 70%);
+  opacity: 0;
+}
+
+.button-base.btn-${slug}:active {
+  transform: translateY(2px) scale(1.06);
+  box-shadow: 0 6px 16px ${palette.shadow};
+}
+
+.button-base.btn-${slug}:active::after {
+  animation: ${rippleKeyframe} 420ms ease-out forwards;
+}
+
+@keyframes ${rippleKeyframe} {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  60% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+`;
+    },
+  },
+  {
+    id: "magnetic-orbit",
+    label: "Magnetic Orbit",
+    category: "Interactive",
+    tags: ["magnetic", "cursor"],
+    description: "Кнопка реагирует на курсор магнитным притяжением и орбитами.",
+    behavior: "magnetic",
+    generator: ({ slug, palette }) => {
+      const orbitKeyframe = `magneticOrbit-${slug}`;
+      return `
+.button-base.btn-${slug} {
+  color: ${palette.text};
+  background: radial-gradient(circle at 10% 0%, ${palette.accent}, ${palette.primary});
+  box-shadow: 0 16px 40px ${palette.shadow};
+}
+
+.button-base.btn-${slug}::before,
+.button-base.btn-${slug}::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  mix-blend-mode: screen;
+}
+
+.button-base.btn-${slug}::after {
+  border-color: ${palette.accent};
+  opacity: 0.7;
+  animation: ${orbitKeyframe} 4s linear infinite;
+}
+
+@keyframes ${orbitKeyframe} {
+  0% { clip-path: inset(0 60% 0 0); }
+  50% { clip-path: inset(0 0 0 60%); }
+  100% { clip-path: inset(0 60% 0 0); }
+}
+`;
+    },
+  },
 ];
 
 const baseButtonSnippet = `.button-base {
@@ -621,6 +711,7 @@ function buildVariantLibrary() {
       description: effect.description,
       category: effect.category,
       tags: effect.tags,
+      behavior: effect.behavior || null,
       palette,
       css: effect.generator({ slug, palette }).trim(),
       html: `<button class="button-base btn-${slug}">${effect.label}</button>`,
@@ -752,6 +843,55 @@ function bindEvents() {
     );
   }
 
+  // Магнитное поведение для отдельных кнопок
+  let magneticTarget = null;
+  let magneticFrame = null;
+  const magneticOffset = { x: 0, y: 0 };
+
+  const applyMagneticTransform = () => {
+    if (!magneticTarget) {
+      magneticFrame = null;
+      return;
+    }
+    magneticTarget.style.transform = `translate(${magneticOffset.x}px, ${magneticOffset.y}px)`;
+    magneticFrame = requestAnimationFrame(applyMagneticTransform);
+  };
+
+  dom.grid.addEventListener("mousemove", (event) => {
+    const btn = event.target.closest('button[data-behavior="magnetic"]');
+    if (!btn) {
+      if (magneticTarget) {
+        magneticTarget.style.transform = "";
+        magneticTarget = null;
+      }
+      return;
+    }
+
+    const rect = btn.getBoundingClientRect();
+    const relX = event.clientX - (rect.left + rect.width / 2);
+    const relY = event.clientY - (rect.top + rect.height / 2);
+    const strength = 10;
+
+    magneticOffset.x = (relX / rect.width) * strength;
+    magneticOffset.y = (relY / rect.height) * strength;
+    magneticTarget = btn;
+
+    if (!magneticFrame) {
+      magneticFrame = requestAnimationFrame(applyMagneticTransform);
+    }
+  });
+
+  dom.grid.addEventListener("mouseleave", () => {
+    if (magneticTarget) {
+      magneticTarget.style.transform = "";
+      magneticTarget = null;
+    }
+    if (magneticFrame) {
+      cancelAnimationFrame(magneticFrame);
+      magneticFrame = null;
+    }
+  });
+
   document.querySelectorAll("[data-scroll]").forEach((control) => {
     control.addEventListener("click", () => {
       const target = document.querySelector(control.dataset.scroll);
@@ -806,6 +946,9 @@ function renderGrid(collection) {
     const previewButton = card.querySelector(".preview-btn");
     previewButton.textContent = "CTA";
     previewButton.className = `button-base preview-btn btn-${variant.id}`;
+    if (variant.behavior) {
+      previewButton.dataset.behavior = variant.behavior;
+    }
 
     fragment.appendChild(instance);
   });

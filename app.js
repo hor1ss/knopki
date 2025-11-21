@@ -557,6 +557,7 @@ const baseButtonSnippet = `.button-base {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }`;
 
+let variantStyleTag = null;
 const variantLibrary = buildVariantLibrary();
 const variantMap = new Map(variantLibrary.map((variant) => [variant.id, variant]));
 const originalOrder = [...variantLibrary];
@@ -590,6 +591,9 @@ const dom = {
   inspectorClose: document.getElementById("inspectorClose"),
   htmlSnippet: document.getElementById("htmlSnippet"),
   cssSnippet: document.getElementById("cssSnippet"),
+  colorPrimary: document.getElementById("primaryColor"),
+  colorSecondary: document.getElementById("secondaryColor"),
+  colorAccent: document.getElementById("accentColor"),
 };
 
 init();
@@ -605,30 +609,33 @@ function init() {
 }
 
 function buildVariantLibrary() {
-  return paletteCatalog.flatMap((palette) =>
-    effectTemplates.map((effect) => {
-      const slug = `${effect.id}-${palette.id}`;
-      return {
-        id: slug,
-        slug,
-        label: effect.label,
-        name: `${effect.label} · ${palette.name}`,
-        description: `${effect.description} Палитра ${palette.name}.`,
-        category: effect.category,
-        tags: effect.tags,
-        palette,
-        css: effect.generator({ slug, palette }).trim(),
-        html: `<button class="button-base btn-${slug}">${effect.label}</button>`,
-      };
-    })
-  );
+  return effectTemplates.map((effect, index) => {
+    const sourcePalette = paletteCatalog[index % paletteCatalog.length];
+    const palette = { ...sourcePalette };
+    const slug = effect.id;
+    return {
+      id: slug,
+      slug,
+      label: effect.label,
+      name: effect.label,
+      description: effect.description,
+      category: effect.category,
+      tags: effect.tags,
+      palette,
+      css: effect.generator({ slug, palette }).trim(),
+      html: `<button class="button-base btn-${slug}">${effect.label}</button>`,
+    };
+  });
 }
 
 function injectVariantStyles() {
-  const styleTag = document.createElement("style");
-  styleTag.id = "buttonVariantStyles";
-  styleTag.textContent = variantLibrary.map((variant) => variant.css).join("\n\n");
-  document.head.appendChild(styleTag);
+  if (variantStyleTag) {
+    variantStyleTag.remove();
+  }
+  variantStyleTag = document.createElement("style");
+  variantStyleTag.id = "buttonVariantStyles";
+  variantStyleTag.textContent = variantLibrary.map((variant) => variant.css).join("\n\n");
+  document.head.appendChild(variantStyleTag);
 }
 
 function buildFilterControls() {
@@ -712,6 +719,39 @@ function bindEvents() {
     highlightActiveCard();
   });
 
+  const handleColorChange = (key, value) => {
+    const active = state.activeId ? variantMap.get(state.activeId) : null;
+    if (!active) return;
+
+    active.palette = { ...active.palette, [key]: value };
+    const template = effectTemplates.find((effect) => effect.id === active.slug);
+    if (!template) return;
+
+    active.css = template.generator({ slug: active.slug, palette: active.palette }).trim();
+    injectVariantStyles();
+
+    if (state.activeId === active.id) {
+      dom.cssSnippet.textContent = `${baseButtonSnippet}\n\n${active.css}`;
+      dom.inspectorPalette.textContent = `${active.palette.primary}, ${active.palette.secondary}`;
+    }
+  };
+
+  if (dom.colorPrimary) {
+    dom.colorPrimary.addEventListener("input", (event) =>
+      handleColorChange("primary", event.target.value)
+    );
+  }
+  if (dom.colorSecondary) {
+    dom.colorSecondary.addEventListener("input", (event) =>
+      handleColorChange("secondary", event.target.value)
+    );
+  }
+  if (dom.colorAccent) {
+    dom.colorAccent.addEventListener("input", (event) =>
+      handleColorChange("accent", event.target.value)
+    );
+  }
+
   document.querySelectorAll("[data-scroll]").forEach((control) => {
     control.addEventListener("click", () => {
       const target = document.querySelector(control.dataset.scroll);
@@ -783,8 +823,14 @@ function openInspector(variantId) {
   dom.inspectorTitle.textContent = variant.name;
   dom.inspectorCategory.textContent = variant.category;
   dom.inspectorDesc.textContent = variant.description;
-  dom.inspectorPalette.textContent = variant.palette.name;
+  dom.inspectorPalette.textContent = `${variant.palette.primary}, ${variant.palette.secondary}`;
   dom.inspectorTags.textContent = variant.tags.join(" · ");
+
+  if (dom.colorPrimary && dom.colorSecondary && dom.colorAccent) {
+    dom.colorPrimary.value = variant.palette.primary;
+    dom.colorSecondary.value = variant.palette.secondary;
+    dom.colorAccent.value = variant.palette.accent || "#ffffff";
+  }
 
   dom.inspectorPreview.innerHTML = "";
   const preview = document.createElement("button");

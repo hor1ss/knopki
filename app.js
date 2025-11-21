@@ -103,213 +103,75 @@ const paletteCatalog = [
 
 const effectTemplates = [
   {
-    id: "pulse-halo",
-    label: "Pulse Halo",
-    category: "Pulse",
-    tags: ["glow", "loop"],
-    description: "Неоновый пульс и дыхание света вокруг кнопки.",
+    id: "tilt-press",
+    label: "Tilt Press",
+    category: "Interactive",
+    tags: ["tilt", "3d"],
+    description: "Лёгкий 3D‑наклон при наведении и мягкое вдавливание при клике.",
     generator: ({ slug, palette }) => {
-      const keyframe = `pulseHalo-${slug}`;
       return `
 .button-base.btn-${slug} {
   color: ${palette.text};
   background: linear-gradient(120deg, ${palette.primary}, ${palette.secondary});
-  box-shadow: 0 14px 32px ${palette.shadow};
-  border: 1px solid transparent;
-  animation: ${keyframe} 2.4s ease-in-out infinite;
-}
-
-.button-base.btn-${slug}::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: inherit;
-  border: 1px solid ${palette.glow};
-  opacity: 0.35;
-}
-
-@keyframes ${keyframe} {
-  0%, 100% {
-    box-shadow: 0 10px 24px ${palette.shadow};
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    box-shadow: 0 16px 40px ${palette.shadow};
-    transform: translateY(-3px) scale(1.04);
-  }
-}
-`;
-    },
-  },
-  {
-    id: "gradient-shift",
-    label: "Gradient Shift",
-    category: "Flow",
-    tags: ["gradient", "smooth"],
-    description: "Медленный сдвиг градиента с эффектом параллакса.",
-    generator: ({ slug, palette }) => {
-      const keyframe = `gradientShift-${slug}`;
-      return `
-.button-base.btn-${slug} {
-  color: ${palette.text};
-  background-image: linear-gradient(135deg, ${palette.primary}, ${palette.secondary}, ${palette.accent});
-  background-size: 220% 220%;
-  animation: ${keyframe} 7s ease infinite;
+  box-shadow: 0 14px 28px ${palette.shadow};
+  transform-origin: center;
+  transform-style: preserve-3d;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .button-base.btn-${slug}:hover {
-  transform: translateY(-4px);
+  transform: perspective(900px) rotateX(-4deg) rotateY(3deg) translateY(-2px);
+  box-shadow: 0 20px 38px ${palette.shadow};
 }
 
-@keyframes ${keyframe} {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.button-base.btn-${slug}:active {
+  transform: perspective(900px) rotateX(0deg) rotateY(0deg) translateY(2px) scale(0.97);
+  box-shadow: 0 8px 18px ${palette.shadow};
 }
 `;
     },
   },
   {
-    id: "magnetic-slide",
-    label: "Magnetic Slide",
-    category: "Slide",
-    tags: ["highlight", "sweep"],
-    description: "Светящаяся полоска скользит поверх кнопки.",
+    id: "cursor-ripple",
+    label: "Cursor Ripple",
+    category: "Click",
+    tags: ["ripple", "click"],
+    description: "Кольцевая рябь расходится из центра при клике.",
     generator: ({ slug, palette }) => {
-      const keyframe = `magneticSweep-${slug}`;
+      const keyframe = `cursorRipple-${slug}`;
       return `
 .button-base.btn-${slug} {
   color: ${palette.text};
-  letter-spacing: 0.08em;
-  background: linear-gradient(120deg, ${palette.primary}, ${palette.secondary});
+  background: radial-gradient(circle at 50% 0%, ${palette.accent}, ${palette.primary});
+  box-shadow: 0 12px 26px ${palette.shadow};
+  overflow: hidden;
 }
 
 .button-base.btn-${slug}::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  mix-blend-mode: screen;
-  transform: translateX(-120%);
-  animation: ${keyframe} 2.4s linear infinite;
-}
-
-@keyframes ${keyframe} {
-  0% { transform: translateX(-120%); }
-  50% { transform: translateX(120%); }
-  100% { transform: translateX(120%); }
-}
-`;
-    },
-  },
-  {
-    id: "outline-trace",
-    label: "Outline Trace",
-    category: "Outline",
-    tags: ["stroke", "minimal"],
-    description: "Контур кнопки подсвечивается бегущей волной.",
-    generator: ({ slug, palette }) => {
-      const keyframe = `outlineTrace-${slug}`;
-      return `
-.button-base.btn-${slug} {
-  color: ${palette.primary};
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid ${palette.primary};
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-.button-base.btn-${slug}::after {
-  content: "";
-  position: absolute;
-  inset: -4px;
   border-radius: inherit;
-  border: 2px solid transparent;
-  animation: ${keyframe} 2.6s linear infinite;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6), transparent 70%);
+  opacity: 0;
+  transform: scale(0.2);
 }
 
-@keyframes ${keyframe} {
-  0% {
-    border-color: transparent;
-    opacity: 0;
-  }
-  35% {
-    border-color: ${palette.primary};
-    opacity: 0.6;
-  }
-  100% {
-    border-color: transparent;
-    opacity: 0;
-  }
-}
-`;
-    },
-  },
-  {
-    id: "parallax-press",
-    label: "Parallax Press",
-    category: "Depth",
-    tags: ["3d", "lift"],
-    description: "Объёмный параллакс, реагирующий на нажатие.",
-    generator: ({ slug, palette }) => {
-      const keyframe = `parallaxTilt-${slug}`;
-      return `
-.button-base.btn-${slug} {
-  color: ${palette.text};
-  background: radial-gradient(circle at 20% 20%, ${palette.accent}, ${palette.primary});
-  box-shadow: 0 20px 35px ${palette.shadow};
-  transform-style: preserve-3d;
-  animation: ${keyframe} 6s ease-in-out infinite;
-}
-
-.button-base.btn-${slug}:active {
-  transform: translateY(4px) scale(0.98);
-  box-shadow: 0 10px 20px ${palette.shadow};
-}
-
-@keyframes ${keyframe} {
-  0% { transform: rotateX(0) rotateY(0); }
-  30% { transform: rotateX(4deg) rotateY(-3deg); }
-  60% { transform: rotateX(-4deg) rotateY(3deg); }
-  100% { transform: rotateX(0) rotateY(0); }
-}
-`;
-    },
-  },
-  {
-    id: "ripple-diffuse",
-    label: "Ripple Diffuse",
-    category: "Ripple",
-    tags: ["wave", "loop"],
-    description: "Расходящаяся волна с мягким свечением.",
-    generator: ({ slug, palette }) => {
-      const keyframe = `rippleDiffuse-${slug}`;
-      return `
-.button-base.btn-${slug} {
-  color: ${palette.text};
-  background: linear-gradient(100deg, ${palette.primary}, ${palette.secondary});
-}
-
-.button-base.btn-${slug}::after {
-  content: "";
-  position: absolute;
-  inset: -25%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.45), transparent 65%);
-  opacity: 0.45;
-  animation: ${keyframe} 2.8s ease-out infinite;
+.button-base.btn-${slug}:active::after {
+  animation: ${keyframe} 420ms ease-out forwards;
 }
 
 @keyframes ${keyframe} {
   0% {
     transform: scale(0.2);
-    opacity: 0.7;
+    opacity: 0.9;
   }
   70% {
-    transform: scale(1);
+    transform: scale(1.1);
     opacity: 0;
   }
   100% {
-    transform: scale(0.2);
+    transform: scale(1.35);
     opacity: 0;
   }
 }
@@ -317,94 +179,48 @@ const effectTemplates = [
     },
   },
   {
-    id: "orbit-lines",
-    label: "Orbit Lines",
-    category: "Orbit",
-    tags: ["loop", "neon"],
-    description: "Две орбитальные линии вращаются в разные стороны.",
+    id: "morph-pill",
+    label: "Morph Pill",
+    category: "Shape",
+    tags: ["morph", "press"],
+    description: "При наведении таблетка растягивается, при клике плющится как резина.",
     generator: ({ slug, palette }) => {
-      const keyframe = `orbitLines-${slug}`;
-      return `
-.button-base.btn-${slug} {
-  color: ${palette.text};
-  background: linear-gradient(120deg, ${palette.primary}, ${palette.secondary});
-  box-shadow: 0 16px 36px ${palette.shadow};
-}
-
-.button-base.btn-${slug}::before,
-.button-base.btn-${slug}::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: inherit;
-  border: 1px solid ${palette.accent};
-  mix-blend-mode: screen;
-}
-
-.button-base.btn-${slug}::before {
-  opacity: 0.55;
-  animation: ${keyframe} 5s linear infinite;
-}
-
-.button-base.btn-${slug}::after {
-  opacity: 0.35;
-  animation: ${keyframe} 5s linear infinite reverse;
-}
-
-@keyframes ${keyframe} {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-`;
-    },
-  },
-  {
-    id: "split-border",
-    label: "Split Border",
-    category: "Duality",
-    tags: ["gradient", "border"],
-    description: "Двойной цвет с бегущей границей по периметру.",
-    generator: ({ slug, palette }) => {
-      const keyframe = `splitBorder-${slug}`;
       return `
 .button-base.btn-${slug} {
   color: ${palette.text};
   background: linear-gradient(90deg, ${palette.primary}, ${palette.secondary});
-  background-size: 200% 100%;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  animation: ${keyframe} 4s ease-in-out infinite;
+  border-radius: 999px;
+  transition: transform 0.18s ease, border-radius 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 10px 24px ${palette.shadow};
 }
 
-.button-base.btn-${slug}::after {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border-radius: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  opacity: 0.6;
+.button-base.btn-${slug}:hover {
+  border-radius: 40px;
+  transform: scaleX(1.05) scaleY(1.02);
+  box-shadow: 0 16px 32px ${palette.shadow};
 }
 
-@keyframes ${keyframe} {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.button-base.btn-${slug}:active {
+  border-radius: 999px;
+  transform: scaleX(1.08) scaleY(0.9) translateY(1px);
+  box-shadow: 0 6px 16px ${palette.shadow};
 }
 `;
     },
   },
   {
-    id: "neon-underline",
-    label: "Neon Underline",
-    category: "Neon",
-    tags: ["underline", "glow"],
-    description: "Линия под кнопкой мерцает неоновым лучом.",
+    id: "underline-wave",
+    label: "Underline Wave",
+    category: "Click",
+    tags: ["underline", "wave"],
+    description: "Ударная волна проходит под кнопкой при клике.",
     generator: ({ slug, palette }) => {
-      const keyframe = `neonUnderline-${slug}`;
+      const keyframe = `underlineWave-${slug}`;
       return `
 .button-base.btn-${slug} {
   color: ${palette.primary};
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: none;
 }
 
@@ -413,131 +229,339 @@ const effectTemplates = [
   position: absolute;
   left: 18px;
   right: 18px;
-  bottom: 10px;
+  bottom: 8px;
   height: 3px;
   border-radius: 999px;
   background: linear-gradient(90deg, transparent, ${palette.accent}, transparent);
-  animation: ${keyframe} 2.4s ease-in-out infinite;
+  transform-origin: center;
+  opacity: 0;
+}
+
+.button-base.btn-${slug}:active::after {
+  animation: ${keyframe} 360ms ease-out forwards;
 }
 
 @keyframes ${keyframe} {
   0% {
     transform: scaleX(0.2);
-    opacity: 0.4;
+    opacity: 0.9;
   }
-  50% {
-    transform: scaleX(1);
+  60% {
+    transform: scaleX(1.1);
     opacity: 1;
   }
   100% {
-    transform: scaleX(0.2);
-    opacity: 0.4;
+    transform: scaleX(1.4);
+    opacity: 0;
   }
 }
 `;
     },
   },
   {
-    id: "skew-switch",
-    label: "Skew Switch",
-    category: "Motion",
-    tags: ["skew", "energy"],
-    description: "Динамичный наклон с резким бластом света.",
+    id: "jelly-press",
+    label: "Jelly Press",
+    category: "Feedback",
+    tags: ["jelly", "bounce"],
+    description: "После клика кнопка дрожит как желе.",
     generator: ({ slug, palette }) => {
-      const keyframe = `skewSwitch-${slug}`;
-      return `
-.button-base.btn-${slug} {
-  color: ${palette.text};
-  background: linear-gradient(100deg, ${palette.secondary}, ${palette.primary});
-}
-
-.button-base.btn-${slug}:hover {
-  transform: translateY(-3px) skewX(-3deg);
-}
-
-.button-base.btn-${slug}::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.45), transparent);
-  transform: translateX(-110%) skewX(-12deg);
-  animation: ${keyframe} 2.2s ease-in-out infinite;
-}
-
-@keyframes ${keyframe} {
-  0% { transform: translateX(-110%) skewX(-12deg); }
-  55% { transform: translateX(110%) skewX(12deg); }
-  100% { transform: translateX(110%) skewX(12deg); }
-}
-`;
-    },
-  },
-  {
-    id: "spark-shimmer",
-    label: "Spark Shimmer",
-    category: "Shimmer",
-    tags: ["spark", "shine"],
-    description: "Искра пробегает по поверхности, добавляя блеск.",
-    generator: ({ slug, palette }) => {
-      const keyframe = `sparkShimmer-${slug}`;
+      const keyframe = `jellyPress-${slug}`;
       return `
 .button-base.btn-${slug} {
   color: ${palette.text};
   background: linear-gradient(120deg, ${palette.primary}, ${palette.secondary});
-  box-shadow: 0 10px 28px ${palette.shadow};
+  box-shadow: 0 12px 26px ${palette.shadow};
 }
 
-.button-base.btn-${slug}::after {
-  content: "";
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  top: 12px;
-  left: 12px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.9), transparent 70%);
-  animation: ${keyframe} 2.6s linear infinite;
+.button-base.btn-${slug}:active {
+  animation: ${keyframe} 420ms ease-out;
 }
 
 @keyframes ${keyframe} {
-  0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
-  10% { opacity: 1; }
-  45% { transform: translate(110px, 6px) scale(1); opacity: 0.8; }
-  80% { transform: translate(180px, -4px) scale(0.4); opacity: 0; }
-  100% { opacity: 0; }
+  0% { transform: scale(1); }
+  25% { transform: scaleX(0.9) scaleY(1.08) translateY(2px); }
+  50% { transform: scaleX(1.08) scaleY(0.92); }
+  75% { transform: scaleX(0.97) scaleY(1.03); }
+  100% { transform: scale(1); }
 }
 `;
     },
   },
   {
-    id: "dash-charge",
-    label: "Dash Charge",
-    category: "Border",
-    tags: ["dashed", "loop"],
-    description: "Пунктирная рамка заряжается и сияет.",
+    id: "spotlight-hover",
+    label: "Spotlight Hover",
+    category: "Hover",
+    tags: ["spotlight", "hover"],
+    description: "При наведении по кнопке скользит световое пятно.",
     generator: ({ slug, palette }) => {
-      const keyframe = `dashCharge-${slug}`;
+      const keyframe = `spotlightSlide-${slug}`;
       return `
 .button-base.btn-${slug} {
-  color: ${palette.primary};
-  background: transparent;
-  border: 2px dashed ${palette.primary};
-  box-shadow: none;
-  letter-spacing: 0.1em;
+  color: ${palette.text};
+  background: linear-gradient(120deg, ${palette.primary}, ${palette.secondary});
+  position: relative;
 }
 
 .button-base.btn-${slug}::after {
   content: "";
   position: absolute;
-  inset: 4px;
-  border-radius: inherit;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
-  animation: ${keyframe} 1.6s linear infinite;
+  inset: -20%;
+  background: radial-gradient(circle at 0% 50%, rgba(255,255,255,0.7), transparent 55%);
+  opacity: 0;
+  transform: translateX(-40%);
+}
+
+.button-base.btn-${slug}:hover::after {
+  opacity: 1;
+  animation: ${keyframe} 1.2s ease-out forwards;
 }
 
 @keyframes ${keyframe} {
-  0% { transform: rotate(0deg); opacity: 0.4; }
-  100% { transform: rotate(360deg); opacity: 0.8; }
+  0% { transform: translateX(-40%); opacity: 0.4; }
+  70% { transform: translateX(40%); opacity: 1; }
+  100% { transform: translateX(60%); opacity: 0; }
+}
+`;
+    },
+  },
+  {
+    id: "badge-pop",
+    label: "Badge Pop",
+    category: "Click",
+    tags: ["badge", "pop"],
+    description: "Из угла кнопки выстреливает маленький бейдж при клике.",
+    generator: ({ slug, palette }) => {
+      const keyframe = `badgePop-${slug}`;
+      return `
+.button-base.btn-${slug} {
+  color: ${palette.text};
+  background: linear-gradient(120deg, ${palette.primary}, ${palette.secondary});
+  position: relative;
+}
+
+.button-base.btn-${slug}::after {
+  content: "+1";
+  position: absolute;
+  right: 10px;
+  top: 6px;
+  font-size: 10px;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 999px;
+  background: ${palette.accent};
+  color: #05060f;
+  opacity: 0;
+  transform: translateY(4px) scale(0.5);
+}
+
+.button-base.btn-${slug}:active::after {
+  animation: ${keyframe} 480ms ease-out forwards;
+}
+
+@keyframes ${keyframe} {
+  0% { opacity: 0; transform: translateY(4px) scale(0.5); }
+  30% { opacity: 1; transform: translateY(-4px) scale(1); }
+  80% { opacity: 1; transform: translateY(-10px) scale(1); }
+  100% { opacity: 0; transform: translateY(-14px) scale(0.9); }
+}
+`;
+    },
+  },
+  {
+    id: "progress-hold",
+    label: "Progress Hold",
+    category: "Hold",
+    tags: ["progress", "hold"],
+    description: "Пока держишь кнопку, заполняется прогресс‑бар внутри неё.",
+    generator: ({ slug, palette }) => {
+      return `
+.button-base.btn-${slug} {
+  color: ${palette.text};
+  background: linear-gradient(120deg, ${palette.primary}, ${palette.secondary});
+  position: relative;
+  overflow: hidden;
+}
+
+.button-base.btn-${slug}::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, ${palette.accent}, rgba(255,255,255,0.2));
+  transform-origin: left center;
+  transform: scaleX(0);
+  opacity: 0.8;
+  transition: transform 1.4s linear;
+}
+
+.button-base.btn-${slug}:active::after {
+  transform: scaleX(1);
+}
+`;
+    },
+  },
+  {
+    id: "glitch-click",
+    label: "Glitch Click",
+    category: "Feedback",
+    tags: ["glitch", "noise"],
+    description: "Текст кнопки на мгновение “глючит” при клике.",
+    generator: ({ slug, palette }) => {
+      const keyframe = `glitchClick-${slug}`;
+      return `
+.button-base.btn-${slug} {
+  color: ${palette.text};
+  background: linear-gradient(120deg, ${palette.primary}, ${palette.secondary});
+  position: relative;
+  overflow: hidden;
+}
+
+.button-base.btn-${slug}::before,
+.button-base.btn-${slug}::after {
+  content: attr(data-label);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+.button-base.btn-${slug}::before {
+  color: #ff3b6c;
+}
+
+.button-base.btn-${slug}::after {
+  color: #3bf5ff;
+}
+
+.button-base.btn-${slug}:active::before,
+.button-base.btn-${slug}:active::after {
+  animation: ${keyframe} 180ms steps(2, end);
+}
+
+@keyframes ${keyframe} {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-2px, 1px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(2px, -1px);
+  }
+}
+`;
+    },
+  },
+  {
+    id: "shadow-warp",
+    label: "Shadow Warp",
+    category: "Hover",
+    tags: ["shadow", "depth"],
+    description: "Тень вытягивается при наведении и схлопывается при клике.",
+    generator: ({ slug, palette }) => {
+      return `
+.button-base.btn-${slug} {
+  color: ${palette.text};
+  background: linear-gradient(120deg, ${palette.primary}, ${palette.secondary});
+  box-shadow: 0 10px 22px ${palette.shadow};
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.button-base.btn-${slug}:hover {
+  box-shadow: 0 20px 40px ${palette.shadow};
+  transform: translateY(-2px);
+}
+
+.button-base.btn-${slug}:active {
+  box-shadow: 0 4px 10px ${palette.shadow};
+  transform: translateY(2px);
+}
+`;
+    },
+  },
+  {
+    id: "icon-launch",
+    label: "Icon Launch",
+    category: "Click",
+    tags: ["icon", "launch"],
+    description: "Иконка‑стрелка вылетает из кнопки при клике.",
+    generator: ({ slug, palette }) => {
+      const keyframe = `iconLaunch-${slug}`;
+      return `
+.button-base.btn-${slug} {
+  color: ${palette.text};
+  background: linear-gradient(120deg, ${palette.primary}, ${palette.secondary});
+  position: relative;
+  padding-right: 40px;
+}
+
+.button-base.btn-${slug}::after {
+  content: "➜";
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  transition: transform 0.18s ease;
+}
+
+.button-base.btn-${slug}:hover::after {
+  transform: translateY(-50%) translateX(4px);
+}
+
+.button-base.btn-${slug}:active::after {
+  animation: ${keyframe} 420ms ease-out;
+}
+
+@keyframes ${keyframe} {
+  0% { transform: translateY(-50%) translateX(0); opacity: 1; }
+  40% { transform: translateY(-140%) translateX(6px); opacity: 1; }
+  80% { transform: translateY(-200%) translateX(10px); opacity: 0; }
+  100% { transform: translateY(-50%) translateX(0); opacity: 0; }
+}
+`;
+    },
+  },
+  {
+    id: "border-flash",
+    label: "Border Flash",
+    category: "Click",
+    tags: ["border", "flash"],
+    description: "При клике граница вспыхивает вокруг кнопки.",
+    generator: ({ slug, palette }) => {
+      const keyframe = `borderFlash-${slug}`;
+      return `
+.button-base.btn-${slug} {
+  color: ${palette.text};
+  background: radial-gradient(circle at 20% 0%, ${palette.accent}, ${palette.primary});
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 26px ${palette.shadow};
+}
+
+.button-base.btn-${slug}::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px solid ${palette.accent};
+  opacity: 0;
+}
+
+.button-base.btn-${slug}:active::after {
+  animation: ${keyframe} 320ms ease-out;
+}
+
+@keyframes ${keyframe} {
+  0% { opacity: 1; transform: scale(0.9); }
+  60% { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 0; transform: scale(1.05); }
 }
 `;
     },
@@ -944,8 +968,9 @@ function renderGrid(collection) {
     });
 
     const previewButton = card.querySelector(".preview-btn");
-    previewButton.textContent = "CTA";
+    previewButton.textContent = variant.label;
     previewButton.className = `button-base preview-btn btn-${variant.id}`;
+    previewButton.setAttribute("data-label", variant.label);
     if (variant.behavior) {
       previewButton.dataset.behavior = variant.behavior;
     }
@@ -978,8 +1003,12 @@ function openInspector(variantId) {
   dom.inspectorPreview.innerHTML = "";
   const preview = document.createElement("button");
   preview.type = "button";
-  preview.textContent = "Call to action";
+  preview.textContent = variant.label;
   preview.className = `button-base btn-${variant.id}`;
+  preview.setAttribute("data-label", variant.label);
+  if (variant.behavior) {
+    preview.dataset.behavior = variant.behavior;
+  }
   dom.inspectorPreview.appendChild(preview);
 
   dom.htmlSnippet.textContent = variant.html;
